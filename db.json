@@ -1,0 +1,13 @@
+
+  {
+    "users":[
+        {
+            "id":"1",
+            "name":"Arslan",
+            "email":"zafar333@gmail.com",
+            "phone":"0302-8970074",
+            "address":"PAK"
+        }
+    ]
+}
+  
