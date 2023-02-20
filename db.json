@@ -1,39 +1,18 @@
 {
   "users": [
     {
-      "id": "1",
-      "name": "Arslan",
-      "email": "zafar333@gmail.com",
-      "phone": "0302-8970074",
-      "address": "PAK"
-    },
-    {
-      "name": "ham",
+      "name": "hamza",
       "email": "arslanz499@gmail.com",
       "phone": "0386438",
       "address": "arslan",
-      "id": "w4mmdgU"
+      "id": 2
     },
     {
-      "name": "ham",
-      "email": "arslanz499@gmail.com",
+      "name": "Arslan Zafuhhjkhkjh",
+      "email": "arslanz499@gmail.njnj",
       "phone": "0386438",
       "address": "arslan",
-      "id": "ywNYHx5"
-    },
-    {
-      "name": "ham",
-      "email": "arslanz499@gmail.com",
-      "phone": "0386438",
-      "address": "arslan",
-      "id": "C2QTiVz"
-    },
-    {
-      "name": "Arslan Zafar",
-      "email": "arslanz499@gmail.com",
-      "phone": "0386438",
-      "address": "arslan",
-      "id": "4A5ABZK"
+      "id": 3
     }
   ]
 }

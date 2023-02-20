@@ -6,12 +6,27 @@ import {
   MDBBtn,
   MDBValidationItem,
 } from "mdb-react-ui-kit";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { createUsersStart } from "../redux/actions";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { createUsersStart, updateUsersStart } from "../redux/actions";
 import { toast } from "react-toastify";
 
 const AddEditUser = () => {
+  const [editmode, seteditmode] = useState(false);
+  const users = useSelector((state) => state.data.users);
+  console.log("userss update", users);
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      seteditmode(true);
+      const singleEditView = users.find((item) => item.id == id);
+      setformvalue({ ...singleEditView });
+    } else {
+      seteditmode(false);
+      setformvalue({ ...initialstate });
+    }
+  }, [id]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const initialstate = {
@@ -25,9 +40,16 @@ const AddEditUser = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (name && email && phone && address) {
-      dispatch(createUsersStart(formvalue));
-      toast.success("User Added Data Successfully");
-      setTimeout(() => navigate("/"), 500);
+      if (!editmode) {
+        dispatch(createUsersStart(formvalue));
+        toast.success("User Added Data Successfully");
+        setTimeout(() => navigate("/"), 500);
+      } else {
+        dispatch(updateUsersStart({ id, formvalue }));
+        seteditmode(false);
+        toast.success("User Updated Data Successfully");
+        setTimeout(() => navigate("/"), 500);
+      }
     }
   };
   function oninputChange(e) {
@@ -41,7 +63,9 @@ const AddEditUser = () => {
       noValidate
       onSubmit={handleSubmit}
     >
-      <p className="fs-2 fw-bold">Edit User Detail</p>
+      <p className="fs-2 fw-bold">
+        {!editmode ? "Add User detail" : "Edit User Detail"}
+      </p>
       <div
         style={{
           margin: "auto",
@@ -52,7 +76,7 @@ const AddEditUser = () => {
       >
         <MDBValidationItem feedback="Please provide a name" invalid>
           <MDBInput
-            value={name}
+            value={name || ""}
             name="name"
             type="text"
             onChange={oninputChange}
@@ -63,7 +87,7 @@ const AddEditUser = () => {
         <br />
         <MDBValidationItem feedback="Please provide a email" invalid>
           <MDBInput
-            value={email}
+            value={email || ""}
             name="email"
             type="email"
             onChange={oninputChange}
@@ -74,7 +98,7 @@ const AddEditUser = () => {
         <br />
         <MDBValidationItem feedback="Please provide a phone no" invalid>
           <MDBInput
-            value={phone}
+            value={phone || ""}
             name="phone"
             type="number"
             onChange={oninputChange}
@@ -85,7 +109,7 @@ const AddEditUser = () => {
         <br />
         <MDBValidationItem feedback="Please provide a address" invalid>
           <MDBInput
-            value={address}
+            value={address || ""}
             name="address"
             type="Address"
             onChange={oninputChange}
@@ -95,7 +119,7 @@ const AddEditUser = () => {
         </MDBValidationItem>
         <div className="col-12">
           <MDBBtn style={{ marginRight: "10px" }} type="submit">
-            ADD
+            {!editmode ? "ADD" : "Update"}
           </MDBBtn>
           <MDBBtn onClick={() => navigate("/")} color="danger">
             Go Back

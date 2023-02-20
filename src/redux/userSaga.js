@@ -1,8 +1,10 @@
 import {
   CREATE_USER_START,
+  DELETE_USER_STATRT,
   LOAD_USERS_ERROR,
   LOAD_USERS_START,
   LOAD_USERS_SUCCESS,
+  UPDATE_USER_START,
 } from "./actionTypes";
 import {
   loadUsersError,
@@ -11,8 +13,17 @@ import {
   createUsersError,
   createUsersSuccess,
   createUsersStart,
+  deleteUsersSuccess,
+  deleteUsersError,
+  updateUsersSuccess,
+  updateUsersError,
 } from "./actions";
-import { loadUsersApi, createUsersApi } from "./api";
+import {
+  loadUsersApi,
+  createUsersApi,
+  deleteUsersApi,
+  updateUsersApi,
+} from "./api";
 import {
   put,
   call,
@@ -23,18 +34,37 @@ import {
   takeEvery,
   takeLatest,
 } from "redux-saga/effects";
-export function* onLoadUsers() {
+function* onLoadUsers() {
   yield takeEvery(LOAD_USERS_START, onLoadUserStartAsynch);
 }
+function* onupdateUsers() {
+  yield takeEvery(UPDATE_USER_START, onupdateUserStartAsynch);
+}
+
 export function* onCreateUsers() {
   yield takeEvery(CREATE_USER_START, onCreateUserStartAsynch);
 }
-export function* onLoadUserStartAsynch() {
+function* onDeleteUsers() {
+  const { payload: userid } = yield take(DELETE_USER_STATRT);
+  yield call(onDeleteUsersStartAsync, userid);
+}
+function* onDeleteUsersStartAsync(userid) {
+  try {
+    const response = yield call(deleteUsersApi, userid);
+    if (response.status === 200) {
+      yield delay(500);
+      console.log("dlete response", userid);
+      yield put(deleteUsersSuccess(userid));
+    }
+  } catch (error) {
+    yield put(deleteUsersError(error.message));
+  }
+}
+function* onLoadUserStartAsynch() {
   try {
     const response = yield call(loadUsersApi);
 
     if (response.status === 200) {
-      console.log("res saga", response);
       delay(500);
       yield put(loadUsersSuccess(response.data));
     }
@@ -42,10 +72,11 @@ export function* onLoadUserStartAsynch() {
     yield put(loadUsersError(error.message));
   }
 }
-export function* onCreateUserStartAsynch({ payload }) {
+
+function* onCreateUserStartAsynch({ payload }) {
   try {
     const response = yield call(createUsersApi, payload);
-    console.log("fhsgffhjgs", response);
+
     if (response.status === 201) {
       console.log("res saga", response);
 
@@ -55,7 +86,22 @@ export function* onCreateUserStartAsynch({ payload }) {
     yield put(createUsersError(error.message));
   }
 }
-const userSaga = [fork(onLoadUsers), fork(onCreateUsers)];
+function* onupdateUserStartAsynch({ payload: { id, formvalue } }) {
+  try {
+    const response = yield call(updateUsersApi, id, formvalue);
+    if (response.status === 200) {
+      yield put(updateUsersSuccess());
+    }
+  } catch (error) {
+    yield put(updateUsersError(error.response.data));
+  }
+}
+const userSaga = [
+  fork(onLoadUsers),
+  fork(onCreateUsers),
+  fork(onDeleteUsers),
+  fork(onupdateUsers),
+];
 function* rootSaga() {
   yield all([...userSaga]);
 }

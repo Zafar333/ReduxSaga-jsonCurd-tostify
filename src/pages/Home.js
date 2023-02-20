@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
+import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import { loadUsersStart } from "../redux/actions";
+import { deleteUsersStart, loadUsersStart } from "../redux/actions";
 import {
   MDBTable,
   MDBTableHead,
@@ -13,14 +14,27 @@ import {
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const users = useSelector((state) => state.data.users);
-  console.log("userssss ", users);
-
+  const userss = useSelector((state) => state.data.users);
+  const { users, loading, error } = useSelector((state) => state.data);
   const dispatch = useDispatch();
+  useEffect(() => {
+    error && toast.error(error);
+  }, [error]);
   useEffect(() => {
     dispatch(loadUsersStart());
   }, []);
-  function handleDelete(ind) {}
+  if (loading) {
+    return (
+      <MDBSpinner style={{ marginTop: "150px" }} role="status">
+        <span className="visually-hidden">...Loading</span>
+      </MDBSpinner>
+    );
+  }
+  function handleDelete(id) {
+    window.confirm("Are you sure you want to delete this item");
+    dispatch(deleteUsersStart(id));
+    toast.success("User deleted successfully");
+  }
   return (
     <div className="container" style={{ marginTop: "150px" }}>
       <MDBTable>
@@ -34,7 +48,7 @@ const Home = () => {
             <th className="col">Action</th>
           </tr>
         </MDBTableHead>
-        {users.map((item, index) => {
+        {userss.map((item, index) => {
           return (
             <MDBTableBody key={index}>
               <tr>
@@ -48,7 +62,7 @@ const Home = () => {
                     className="m-1"
                     tag="a"
                     color="none"
-                    onClick={() => handleDelete(index)}
+                    onClick={() => handleDelete(item.id)}
                   >
                     <MDBTooltip title="Delete" tag="a">
                       <MDBIcon
@@ -59,8 +73,8 @@ const Home = () => {
                       ></MDBIcon>
                     </MDBTooltip>
                   </MDBBtn>{" "}
-                  <Link to={`/edituser/${index}`}>
-                    <MDBTooltip title="Delete" tag="a">
+                  <Link to={`/edituser/${item.id}`}>
+                    <MDBTooltip title="Edit" tag="a">
                       <MDBIcon
                         fas
                         icon="pen"
@@ -69,7 +83,7 @@ const Home = () => {
                       ></MDBIcon>
                     </MDBTooltip>
                   </Link>{" "}
-                  <Link to={`/userinfo/${index}`}>
+                  <Link to={`/userinfo/${item.id}`}>
                     <MDBTooltip title="view" tag="a">
                       <MDBIcon
                         fas
